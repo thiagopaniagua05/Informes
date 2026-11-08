@@ -1,12 +1,14 @@
 import { useLayoutEffect, useRef } from 'react'
 
 /** Campo de texto con etiqueta y, opcionalmente, botones rápidos debajo (lugares usados, "Negativo", etc.) */
-export function Campo({ label, value, onChange, chips = [], onBorrarChip, placeholder, inputMode, type = 'text', mayus, ancho }) {
+export function Campo({ label, value, onChange, chips = [], onBorrarChip, placeholder, inputMode, type = 'text', mayus, ancho, error }) {
   return (
     <label className={'campo' + (ancho ? ' ancho' : '')}>
       <span>{label}</span>
       <input type={type} value={value ?? ''} placeholder={placeholder} inputMode={inputMode} autoComplete="off"
+        className={error ? 'error' : ''}
         onChange={(e) => onChange(mayus ? e.target.value.toUpperCase() : e.target.value)} />
+      {error && <small className="error-msg">{error}</small>}
       {chips.length > 0 && (
         <div className="chips">
           {chips.filter((c) => c !== value).map((c) => (
@@ -32,9 +34,9 @@ export function TextoLargo({ value, onChange, placeholder, onFocus, refExterno, 
   return <textarea ref={r} rows={rows} value={value} placeholder={placeholder} onFocus={onFocus} onChange={(e) => onChange(e.target.value)} />
 }
 
-export function Bloque({ titulo, children, onQuitar, extra }) {
+export function Bloque({ id, titulo, children, onQuitar, extra }) {
   return (
-    <section className="bloque">
+    <section className="bloque" id={id}>
       <header>
         <h3>{titulo}</h3>
         {extra}

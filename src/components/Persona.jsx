@@ -1,5 +1,5 @@
 import { Campo, Bloque } from './Campos'
-import { calcularEdad } from '../datos'
+import { calcularEdad, fechaValida } from '../datos'
 
 const CIVIL = ['SOLTERO/A', 'CASADO/A', 'DIVORCIADO/A', 'VIUDO/A', 'CONCUBINO/A']
 const NO_BRINDA = ['No brinda']
@@ -10,7 +10,7 @@ const conBarras = (v) => {
   return d.length > 4 ? `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}` : d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d
 }
 
-export default function Persona({ p, titulo, onChange, onQuitar, fechaHecho }) {
+export default function Persona({ id, p, titulo, onChange, onQuitar, fechaHecho }) {
   const set = (k) => (v) => onChange({ ...p, [k]: v })
   const setNac = (v) => {
     const nacimiento = conBarras(v)
@@ -18,11 +18,12 @@ export default function Persona({ p, titulo, onChange, onQuitar, fechaHecho }) {
     onChange({ ...p, nacimiento, edad: edad || (p.edadAuto ? '' : p.edad), edadAuto: !!edad })
   }
   return (
-    <Bloque titulo={titulo} onQuitar={onQuitar}>
+    <Bloque id={id} titulo={titulo} onQuitar={onQuitar}>
       <div className="grilla">
         <Campo label="Apellido y nombre" value={p.nombre} onChange={set('nombre')} ancho />
         <Campo label="DNI" value={p.dni} onChange={(v) => set('dni')(v.replace(/[^\d.]/g, ''))} inputMode="numeric" />
-        <Campo label="Fecha de nacimiento" value={p.nacimiento} onChange={setNac} inputMode="numeric" placeholder="dd/mm/aaaa" />
+        <Campo label="Fecha de nacimiento" value={p.nacimiento} onChange={setNac} inputMode="numeric" placeholder="dd/mm/aaaa"
+          error={p.nacimiento?.length === 10 && !fechaValida(p.nacimiento) ? 'Fecha inválida (día/mes/año)' : ''} />
         <Campo label="Edad" value={p.edad} onChange={(v) => onChange({ ...p, edad: v.replace(/\D/g, ''), edadAuto: false })} inputMode="numeric" />
         <label className="campo">
           <span>Estado civil</span>

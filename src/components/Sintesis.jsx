@@ -15,7 +15,7 @@ export default function Sintesis({ renglones, onChange }) {
     if (!cursor.current) return
     const el = refs.current[cursor.current]?.current
     cursor.current = null
-    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length) }
+    if (el) { el.focus({ preventScroll: true }); el.setSelectionRange(el.value.length, el.value.length); el.closest('.renglon')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }
   })
 
   const cambiar = (id, patch) => onChange(renglones.map((r) => (r.id === id ? { ...r, ...patch } : r)))

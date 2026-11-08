@@ -99,3 +99,13 @@ button.ver { min-height: 58px; font-size: 18px; border-radius: 12px; }
 @media (max-width: 380px) {
   .grilla { grid-template-columns: 1fr; }
 }
+
+/* Al bajar solo hasta algo nuevo, que no quede tapado por el encabezado fijo */
+.bloque, .sub-bloque, .fila-agente, .renglon { scroll-margin-top: 84px; }
+.sub-bloque { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--borde); }
+.sub-titulo { display: flex; align-items: center; margin-bottom: 8px; }
+.sub-titulo b { color: var(--tinta); }
+.botones-secciones.chicos { margin-top: 12px; }
+.botones-secciones.chicos button { flex: 1 1 30%; min-height: 42px; font-size: 14px; }
+input.error { border-color: var(--rojo); background: #fef2f2; }
+.error-msg { color: var(--rojo); font-weight: 600; }

@@ -10,7 +10,9 @@ Stack: React 18 + Vite. No tiene backend ni login.
 - **Informe**:
   - Fecha y hora ya cargadas. "Negativo" por defecto donde corresponde.
   - Se agregan solo las secciones que hacen falta: víctima / llamante, testigo, detenido (las veces que haga falta), comisaría, móvil de traslado y relevamiento de cámaras. Lo que no se agrega o queda vacío no sale en el mensaje.
-  - La edad se calcula sola desde la fecha de nacimiento, a la fecha del hecho.
+  - La edad se calcula sola desde la fecha de nacimiento, a la fecha del hecho. Si la fecha es imposible (ej. 12/13/1980), la app avisa.
+  - En el móvil de traslado, además de la policía, se pueden agregar SAME, Bomberos o Defensa Civil con su número de móvil y quién está a cargo.
+  - Al agregar algo, la pantalla baja sola hasta eso y deja el cursor listo para escribir.
   - Los lugares, unidades y compañeros que usás quedan como botones para la próxima vez.
 - **Novedad**: el comunicado corto para el supervisor.
 - **Síntesis / novedad por renglones**: cada renglón lleva su hora (la actual, editable). Debajo del renglón están los **comienzos rápidos** ("Se presenta en el puesto de guardia…", "Se modula a la Central…"); se editan y se agregan propios desde *✎ Editar comienzos*.

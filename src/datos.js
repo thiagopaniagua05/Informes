@@ -43,10 +43,19 @@ export const ahora = () => { const d = new Date(); return { fecha: `${d.getFullY
 export const nuevoId = () => Math.random().toString(36).slice(2, 9)
 const fechaDMY = (iso, corto = false) => { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}/${m}/${corto ? y.slice(2) : y}` }
 
+/** dd/mm/aaaa con día y mes posibles (evita cosas como 12/13/1980) */
+export function fechaValida(nac) {
+  const m = String(nac || '').match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/)
+  if (!m) return false
+  const [d, mes, y] = [+m[1], +m[2], +m[3]]
+  const f = new Date(y, mes - 1, d)
+  return f.getFullYear() === y && f.getMonth() === mes - 1 && f.getDate() === d && y > 1900
+}
+
 /** Edad a la fecha del hecho a partir de una fecha de nacimiento dd/mm/aaaa */
 export function calcularEdad(nac, fechaHecho) {
   const m = String(nac || '').match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})$/)
-  if (!m) return ''
+  if (!m || !fechaValida(nac)) return ''
   let y = +m[3]; if (y < 100) y += y > 30 ? 1900 : 2000
   const ref = fechaHecho ? new Date(fechaHecho + 'T12:00') : new Date()
   let edad = ref.getFullYear() - y
@@ -67,6 +76,10 @@ export const EXTRA = {
 export const TITULO_PERSONA = { victima: 'VICTIMA / LLAMANTE', testigo: 'TESTIGO', detenido: 'DETENIDO' }
 
 export const personaVacia = (tipo) => ({ id: nuevoId(), tipo, nacionalidad: 'ARGENTINA' })
+// Otros móviles que intervienen en el traslado (además de policía): SAME, Bomberos, etc.
+export const TIPOS_TRASLADO = ['SAME', 'BOMBEROS', 'DEFENSA CIVIL']
+export const otroTraslado = (tipo) => ({ id: nuevoId(), tipo, movil: '', cargo: '' })
+
 export const renglon = (hora) => ({ id: nuevoId(), hora: hora || ahora().hora, texto: '' })
 
 export function informeNuevo(perfil) {
@@ -74,7 +87,7 @@ export function informeNuevo(perfil) {
   return {
     tipo: 'informe', fecha, hora, lugar: perfil?.base || '', calificacion: '',
     vehiculo: 'Negativo', unidad: '', zona: perfil?.zona || '', agentes: [perfil?.nombre].filter(Boolean), ofPolicia: 'Negativo',
-    traslado: { movil: 'Negativo', oficial: 'Negativo' }, comisaria: null, camaras: null,
+    traslado: { movil: 'Negativo', oficial: 'Negativo', otros: [] }, comisaria: null, camaras: null,
     personas: [], sintesis: [renglon(hora)], sustraidos: 'Negativo', cerrajero: 'Negativo',
     supervisores: perfil?.supervisores || '',
   }
@@ -112,7 +125,13 @@ export function mensaje(d) {
   T.push('*-PERSONAL INTERVINIENTE*', '')
   T.push(`VEHICULO NO IDENTIFICABLE: ${d.vehiculo}`, `UNIDAD DE PATRULLA: N° ${d.unidad}`, `ZONA: ${d.zona}`,
     `AGENTE: ${d.agentes.filter(Boolean).join(', ')}`, `OF. DE POLICIA: ${d.ofPolicia}`, '')
-  if (d.traslado) T.push('_*MOVIL DE TRASLADO COMANDO*_', '', `*MOVIL:* *N°* ${d.traslado.movil}`, `*A/C OF.DE POLICIA:* ${d.traslado.oficial}`, '')
+  if (d.traslado) {
+    T.push('_*MOVIL DE TRASLADO COMANDO*_', '', `*MOVIL:* *N°* ${d.traslado.movil}`, `*A/C OF.DE POLICIA:* ${d.traslado.oficial}`, '')
+    for (const o of d.traslado.otros || []) {
+      if (!o.movil.trim() && !o.cargo.trim()) continue
+      T.push(`*MOVIL ${o.tipo}:* *N°* ${o.movil.trim()}`, `*A/C ${o.tipo}:* ${o.cargo.trim()}`, '')
+    }
+  }
   if (d.comisaria != null) T.push(`_*DEPENDENCIA ACTUACIONES COMISARIA*:_ ${d.comisaria}`, '')
   for (const p of d.personas) {
     const campos = [...PERSONA_CAMPOS, ...EXTRA[p.tipo]].filter(([k]) => String(p[k] || '').trim())
