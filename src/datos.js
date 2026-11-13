@@ -25,7 +25,7 @@ export const cargarComienzos = () => leer(K.comienzos, COMIENZOS_BASE)
 export const guardarComienzos = (c) => escribir(K.comienzos, c)
 
 // Lugares, compañeros y unidades usados: se recuerdan para tocarlos la próxima vez
-export const cargarRecuerdos = () => ({ lugares: [], companeros: [], unidades: [], ...leer(K.recuerdos, {}) })
+export const cargarRecuerdos = () => ({ lugares: [], companeros: [], unidades: [], binomios: [], ...leer(K.recuerdos, {}) })
 export function recordar(tipo, valor) {
   const v = String(valor || '').trim()
   if (!v || /^negativo$/i.test(v)) return
@@ -80,6 +80,11 @@ export const personaVacia = (tipo) => ({ id: nuevoId(), tipo, nacionalidad: 'ARG
 export const TIPOS_TRASLADO = ['SAME', 'BOMBEROS', 'DEFENSA CIVIL']
 export const otroTraslado = (tipo) => ({ id: nuevoId(), tipo, movil: '', cargo: '' })
 
+// Binomio en la novedad: se recuerda como "Apellido Nombre · LP"
+export const binomioVacio = () => ({ id: nuevoId(), nombre: '', lp: '' })
+export const binomioDeTexto = (t) => { const [nombre, lp = ''] = t.split(' · '); return { id: nuevoId(), nombre, lp } }
+export const binomioATexto = (b) => [b.nombre.trim(), b.lp.trim()].filter(Boolean).join(' · ')
+
 export const renglon = (hora) => ({ id: nuevoId(), hora: hora || ahora().hora, texto: '' })
 
 export function informeNuevo(perfil) {
@@ -96,7 +101,7 @@ export function informeNuevo(perfil) {
 export function novedadNueva(perfil) {
   const { fecha, hora } = ahora()
   return {
-    tipo: 'novedad', fecha, hora, agente: perfil?.nombre || '', lp: perfil?.lp || '',
+    tipo: 'novedad', fecha, hora, agente: perfil?.nombre || '', lp: perfil?.lp || '', binomios: [],
     lugar: perfil?.base || '', zona: perfil?.zona || '', sintesis: [renglon(hora)], supervisores: perfil?.supervisores || '',
   }
 }
@@ -112,7 +117,8 @@ export function mensaje(d) {
       `*Fecha:*  ${fechaDMY(d.fecha, true)}`,
       `*Hora:* ${d.hora} hs`,
       `*Agente:* ${d.agente} `,
-      `*LP:* ${d.lp}`, '',
+      `*LP:* ${d.lp}`,
+      ...(d.binomios || []).filter((b) => b.nombre.trim()).flatMap((b) => [`*Agente:* ${b.nombre.trim()} `, `*LP:* ${b.lp.trim()}`]), '',
       `*Zona* ${zona}`, '',
       '*Novedad:* ', ...lineasSintesis(d.sintesis), '',
       `_*Supervisores  de Turno*:_  _*${d.supervisores}*_`,

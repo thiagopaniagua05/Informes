@@ -58,7 +58,8 @@ button.grande { min-height: 56px; font-size: 18px; }
 .grilla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .campo > span, .etiqueta { font-size: 14px; font-weight: 600; color: var(--gris); }
-.campo.ancho { grid-column: 1 / -1; }
+.campo.ancho, .grilla > .ancho { grid-column: 1 / -1; }
+.binomio { padding-top: 10px; border-top: 1px dashed var(--borde); scroll-margin-top: 84px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .chip { display: inline-flex; border: 1px solid var(--celeste); border-radius: 999px; background: #f8fbff; overflow: hidden; }
 .chip button { border: 0; background: none; min-height: 34px; padding: 4px 12px; font-size: 14px; color: var(--azul); font-weight: 600; border-radius: 0; }

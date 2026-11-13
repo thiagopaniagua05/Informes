@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Campo, Bloque, TextoLargo } from './Campos'
 import Persona from './Persona'
 import Sintesis from './Sintesis'
-import { cargarRecuerdos, olvidar, personaVacia, otroTraslado, TIPOS_TRASLADO } from '../datos'
+import { cargarRecuerdos, olvidar, personaVacia, otroTraslado, TIPOS_TRASLADO, binomioVacio, binomioDeTexto } from '../datos'
 
 const NEG = ['Negativo']
 const ZONAS = ['1', '2', '3', '4', '5', '5 BIS', '6', '7', '8', '9', '10', '11', '12', '13', '13 BIS', '14', '14 BIS', '15', '15 BIS',
@@ -40,6 +40,8 @@ export default function Formulario({ d, set, onVer }) {
   const setP = (id, p) => set({ personas: d.personas.map((x) => (x.id === id ? p : x)) })
   const agregarP = (tipo) => { const p = personaVacia(tipo); agregarY({ personas: [...d.personas, p] }, 'p-' + p.id) }
   const tr = d.traslado
+  const bins = d.binomios || []
+  const setBin = (id, patch) => set({ binomios: bins.map((b) => (b.id === id ? { ...b, ...patch } : b)) })
   const setOtro = (id, patch) => set({ traslado: { ...tr, otros: (tr.otros || []).map((o) => (o.id === id ? { ...o, ...patch } : o)) } })
   const numero = (p) => {
     const mismas = d.personas.filter((x) => x.tipo === p.tipo)
@@ -61,6 +63,28 @@ export default function Formulario({ d, set, onVer }) {
               <ZonaSelect value={d.zona} onChange={(zona) => set({ zona })} />
               <Campo label="Agente" value={d.agente} onChange={(agente) => set({ agente })} />
               <Campo label="LP" value={d.lp} onChange={(lp) => set({ lp })} inputMode="numeric" />
+              {bins.map((b, i) => (
+                <div className="binomio ancho" id={'bin-' + b.id} key={b.id}>
+                  <div className="sub-titulo"><b>Binomio{bins.length > 1 ? ' ' + (i + 1) : ''}</b>
+                    <button type="button" className="quitar" onClick={() => set({ binomios: bins.filter((x) => x.id !== b.id) })}>Quitar</button>
+                  </div>
+                  <div className="grilla">
+                    <Campo label="Agente" value={b.nombre} onChange={(nombre) => setBin(b.id, { nombre })} placeholder="Apellido y nombre" />
+                    <Campo label="LP" value={b.lp} onChange={(lp) => setBin(b.id, { lp: lp.replace(/\D/g, '') })} inputMode="numeric" />
+                  </div>
+                </div>
+              ))}
+              <div className="ancho">
+                <div className="chips">
+                  {rec.binomios.filter((t) => !bins.some((b) => b.nombre === t.split(' · ')[0])).map((t) => (
+                    <span className="chip" key={t}>
+                      <button type="button" onClick={() => set({ binomios: [...bins.filter((b) => b.nombre.trim()), binomioDeTexto(t)] })}>+ {t}</button>
+                      <button type="button" className="x" aria-label="Olvidar" onClick={() => borrarRec('binomios')(t)}>×</button>
+                    </span>
+                  ))}
+                </div>
+                <button type="button" className="link" onClick={() => { const b = binomioVacio(); agregarY({ binomios: [...bins, b] }, 'bin-' + b.id) }}>+ Agregar binomio</button>
+              </div>
             </>}
         </div>
       </Bloque>

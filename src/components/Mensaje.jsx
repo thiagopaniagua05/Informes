@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { mensaje, faltantes, recordar } from '../datos'
+import { mensaje, faltantes, recordar, binomioATexto } from '../datos'
 
 // Muestra el texto como se ve en WhatsApp: *negrita* y _cursiva_
 function Vista({ texto }) {
@@ -18,6 +18,7 @@ export default function Mensaje({ d, onEditar, onNuevo }) {
   const recordarTodo = () => {
     recordar('lugares', d.lugar)
     if (d.tipo === 'informe') { recordar('unidades', d.unidad); d.agentes.slice(1).forEach((a) => recordar('companeros', a)) }
+    else (d.binomios || []).filter((b) => b.nombre.trim()).forEach((b) => { recordar('binomios', binomioATexto(b)); recordar('companeros', b.nombre) })
   }
   const copiar = async () => {
     try { await navigator.clipboard.writeText(texto) } catch {
